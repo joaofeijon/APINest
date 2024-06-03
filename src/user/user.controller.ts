@@ -16,12 +16,12 @@ export class UserController{
 
     @Get()
     async readAll(){
-        return { users: [] }
+        return await this.userService.readAll()
     }
 
     @Get(':id')
-    async readOne(@Param('id', ParseIntPipe) id){ // igual a req.params.id
-        return { user: {}, id }
+    async readOne(@Param('id', ParseIntPipe) id: number){ // igual a req.params.id
+        return await this.userService.readOne( id )
     }
 
     @Put(':id')
