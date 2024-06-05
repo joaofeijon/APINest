@@ -10,8 +10,8 @@ export class UserController{
     constructor( private readonly userService: UserService ){}
 
     @Post()
-    async create( @Body() {email,name,password}: CreateUserDTO){ // é igual ao body-parser
-        return await this.userService.create( {email,name,password} )
+    async create( @Body() {email,name,password, birthAt}: CreateUserDTO){ // é igual ao body-parser
+        return await this.userService.create( {email,name,password, birthAt} )
     }
 
     @Get()
@@ -25,25 +25,13 @@ export class UserController{
     }
 
     @Put(':id')
-    async update( @Body() {name, email, password}: UpdatePutUserDTO, @Param('id', ParseIntPipe) id){
-        return {
-            method: 'put',
-            name,
-            email, 
-            password, 
-            id
-        }
+    async update( @Body() data: UpdatePutUserDTO, @Param('id', ParseIntPipe) id){
+        return await this.userService.update(id, data)
     }
 
     @Patch(':id')
-    async updatePartial(@Body() {name, email, password}: UpdatePatchUserDTO, @Param('id', ParseIntPipe) id){
-        return {
-            method: 'patch',
-            name, 
-            email, 
-            password,
-            id
-        }
+    async updatePartial(@Body() data: UpdatePatchUserDTO, @Param('id', ParseIntPipe) id){
+        return await this.userService.updatePartial(id, data)
     }
 
     @Delete(':id')
