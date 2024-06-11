@@ -16,7 +16,7 @@ async function bootstrap() {
   );
   app.enableShutdownHooks();
 
-  app.useGlobalInterceptors( new logInterceptor() )
+  // app.useGlobalInterceptors( new logInterceptor() )
 
   await app.listen(3000);
 }
