@@ -4,6 +4,7 @@ import { UpdatePutUserDTO } from "./dto/update-put-user.dto";
 import { UpdatePatchUserDTO } from "./dto/update-patch-user.dto";
 import { UserService } from "./user.service";
 import { logInterceptor } from "src/interceptos/log.inteceptor";
+import { ParamId } from "src/decorators/param-id.decorator";
 
 @UseInterceptors( logInterceptor )
 @Controller('users')
@@ -23,17 +24,17 @@ export class UserController{
     }
 
     @Get(':id')
-    async readOne(@Param('id', ParseIntPipe) id: number){ // igual a req.params.id
+    async readOne(@ParamId() id: number){ // igual a req.params.id
         return await this.userService.readOne( id )
     }
 
     @Put(':id')
-    async update( @Body() data: UpdatePutUserDTO, @Param('id', ParseIntPipe) id){
+    async update( @Body() data: UpdatePutUserDTO, @ParamId() id){
         return await this.userService.update(id, data)
     }
 
     @Patch(':id')
-    async updatePartial(@Body() data: UpdatePatchUserDTO, @Param('id', ParseIntPipe) id){
+    async updatePartial(@Body() data: UpdatePatchUserDTO, @ParamId() id){
         return await this.userService.updatePartial(id, data)
     }
 
