@@ -1,17 +1,31 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { Prisma } from "@prisma/client";
+import { User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
+import { AuthRegisterDTO } from "./dto/auth-register.dto";
+import { UserService } from "src/user/user.service";
+import { access } from "fs";
 
 @Injectable()
 export class AuthSerive{
     constructor( 
         private readonly jwtService: JwtService, 
-        private readonly prisma: PrismaService
+        private readonly prisma: PrismaService,
+        private readonly userSerive: UserService
     ) {}
 
-    async createToken(){
-        // return this.jwtService.sign
+    async createToken(user: User){
+        return {
+            access: this.jwtService.sign({
+                sub: user.id,
+                name: user.name,
+                email: user.email
+            }, {
+                expiresIn: "7 days",
+                issuer: "login",
+                audience: "users"
+            })
+        }
     }
 
     async checkToken( token: string ){
@@ -19,6 +33,7 @@ export class AuthSerive{
     }
 
     async login(email: string, password: string){
+        
         const user = await this.prisma.user.findFirst({
             where: {
                 email,
@@ -29,7 +44,7 @@ export class AuthSerive{
         if( !user )
             throw new UnauthorizedException("Email ou senha esta incorreto!!!")
         
-        return user
+        return this.createToken( user )
     }
 
     async forget (email: string){
@@ -52,7 +67,7 @@ export class AuthSerive{
 
         const id = 0
 
-        await this.prisma.user.update({
+        const user = await this.prisma.user.update({
             where: {
                 id
             },
@@ -60,7 +75,14 @@ export class AuthSerive{
                 password
             }
         })
+        //@ts-ignore
+        return this.checkToken( user )
+    }
 
-        return true
+    async register (data: AuthRegisterDTO){
+        const user = await this.userSerive.create( data )
+
+        //@ts-ignore
+        return this.checkToken( user )
     }
 }
